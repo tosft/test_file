@@ -3,11 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"strings"
+	"search"
 	"utils"
 )
-
-const success = "success"
 
 func main() {
 	flag.Parse()
@@ -16,21 +14,8 @@ func main() {
 	for _, v := range fileNames {
 		fmt.Println(v)
 		lines := utils.ReadFile(v)
-		num := sliceContainsSuccess(lines)
-		fmt.Println(num)
+		containStrs := search.SliceContainsSuccess(lines)
+		fmt.Println(len(containStrs))
+		fmt.Println(containStrs[0])
 	}
-}
-
-func sliceContainsSuccess(strs []string) int32 {
-	var num int32 = 0
-	for _, v := range strs {
-		if strContainSuccess(v) {
-			num++
-		}
-	}
-	return num
-}
-
-func strContainSuccess(str string) bool {
-	return strings.Contains(str, success)
 }
