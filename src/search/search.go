@@ -5,6 +5,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"utils"
 )
 
 const (
@@ -60,4 +61,19 @@ func SumFile(lines []string) int {
 		sum += Sum(v)
 	}
 	return sum
+}
+
+func SpliceStr(fileName string, size int, sum int) string {
+	splitStrs := strings.Split(fileName, "_")
+	date := strings.Split(splitStrs[1], ".")[0]
+	str := fmt.Sprintf("日期:%s  充值笔数:%s  总金额:%s", date, strconv.Itoa(size), strconv.Itoa(sum))
+	return str
+}
+
+func GetFileSuccessSizeAndSum(fileName string) (size, sum int) {
+	lines := utils.ReadFile(fileName)
+	containStrs := SliceContainsSuccess(lines)
+	sum = SumFile(containStrs)
+	size = len(containStrs)
+	return
 }

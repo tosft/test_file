@@ -3,35 +3,48 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
 	"search"
-	"strconv"
 	"strings"
 	"utils"
 )
 
+var path string
+var fileName string
+
 func main() {
 	flag.Parse()
-	root := flag.Arg(0)
-	fileNames := utils.GetFileList(root)
+	arg := flag.Arg(0)
+	strs := strings.Split(arg, ",")
+	path = strs[0]
+	fileName = strs[1]
 
+	fmt.Println("start 18080....")
+	http.HandleFunc("/", register)
+	http.ListenAndServe(":18080", nil)
+
+}
+
+func register(w http.ResponseWriter, r *http.Request) {
+	fileNames := utils.GetFileList(path)
+	var strs []string
 	for _, v := range fileNames {
-		size, sum := test(v)
-		fmt.Println(spiltStr(v, size, sum))
+
+		if strings.Contains(v, fileName) {
+			size, sum := search.GetFileSuccessSizeAndSum(v)
+			strs = append(strs, search.SpliceStr(v, size, sum))
+		}
 	}
-
+	fmt.Fprintln(w, strsToString(strs))
 }
 
-func spiltStr(fileName string, size int, sum int) string {
-	splitStrs := strings.Split(fileName, "_")
-	date := strings.Split(splitStrs[1], ".")[0]
-	str := fmt.Sprintf("日期:%s  充值笔数:%s  总金额:%s", date, strconv.Itoa(size), strconv.Itoa(sum))
+func strsToString(strs []string) string {
+
+	var str string
+	str += "<div>"
+	for _, v := range strs {
+		str += v + " <br/>"
+	}
+	str += "</div>"
 	return str
-}
-
-func test(fileName string) (size, sum int) {
-	lines := utils.ReadFile(fileName)
-	containStrs := search.SliceContainsSuccess(lines)
-	sum = search.SumFile(containStrs)
-	size = len(containStrs)
-	return
 }
